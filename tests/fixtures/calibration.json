@@ -1,0 +1,927 @@
+{
+  "description": "Relative selection-profile diagnostics. NOT measured Elo or match calibration.",
+  "engine": "stockfish@19.0.1 lite-single",
+  "search": {
+    "depth": 7,
+    "movetime": 1500,
+    "multiPV": "all legal moves"
+  },
+  "method": "Fixed engine candidate scores isolate profile weighting; actual app also varies search depth/time. Seeded 10,000 samples per rating per position; mate scores saturate at 10,000. Limited handcrafted positions are not a representative tournament benchmark.",
+  "summary": [
+    {
+      "rating": 700,
+      "samples": 70000,
+      "meanCentipawnLoss": 108.27,
+      "bestMovePercent": 25.85
+    },
+    {
+      "rating": 1000,
+      "samples": 70000,
+      "meanCentipawnLoss": 88.54,
+      "bestMovePercent": 28.49
+    },
+    {
+      "rating": 1300,
+      "samples": 70000,
+      "meanCentipawnLoss": 71.83,
+      "bestMovePercent": 30.73
+    },
+    {
+      "rating": 1600,
+      "samples": 70000,
+      "meanCentipawnLoss": 28.6,
+      "bestMovePercent": 38.45
+    },
+    {
+      "rating": 2000,
+      "samples": 70000,
+      "meanCentipawnLoss": 19.02,
+      "bestMovePercent": 41.87
+    },
+    {
+      "rating": 2400,
+      "samples": 70000,
+      "meanCentipawnLoss": 9.45,
+      "bestMovePercent": 52.61
+    },
+    {
+      "rating": 2700,
+      "samples": 70000,
+      "meanCentipawnLoss": 0,
+      "bestMovePercent": 100
+    }
+  ],
+  "positions": [
+    {
+      "name": "Opening",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+      "legalMoves": 20,
+      "returnedCandidates": 20,
+      "candidates": [
+        {
+          "depth": 7,
+          "move": "e2e4",
+          "score": 21
+        },
+        {
+          "depth": 7,
+          "move": "d2d4",
+          "score": 11
+        },
+        {
+          "depth": 7,
+          "move": "e2e3",
+          "score": 11
+        },
+        {
+          "depth": 7,
+          "move": "c2c4",
+          "score": 11
+        },
+        {
+          "depth": 7,
+          "move": "g1f3",
+          "score": 8
+        },
+        {
+          "depth": 7,
+          "move": "b1c3",
+          "score": 2
+        },
+        {
+          "depth": 7,
+          "move": "b2b3",
+          "score": -7
+        },
+        {
+          "depth": 7,
+          "move": "d2d3",
+          "score": -9
+        },
+        {
+          "depth": 7,
+          "move": "c2c3",
+          "score": -11
+        },
+        {
+          "depth": 7,
+          "move": "a2a3",
+          "score": -16
+        },
+        {
+          "depth": 7,
+          "move": "a2a4",
+          "score": -21
+        },
+        {
+          "depth": 7,
+          "move": "h2h3",
+          "score": -23
+        },
+        {
+          "depth": 7,
+          "move": "g2g3",
+          "score": -27
+        },
+        {
+          "depth": 7,
+          "move": "h2h4",
+          "score": -29
+        },
+        {
+          "depth": 7,
+          "move": "f2f4",
+          "score": -32
+        },
+        {
+          "depth": 7,
+          "move": "b2b4",
+          "score": -41
+        },
+        {
+          "depth": 7,
+          "move": "b1a3",
+          "score": -43
+        },
+        {
+          "depth": 7,
+          "move": "g1h3",
+          "score": -54
+        },
+        {
+          "depth": 7,
+          "move": "f2f3",
+          "score": -68
+        },
+        {
+          "depth": 7,
+          "move": "g2g4",
+          "score": -85
+        }
+      ]
+    },
+    {
+      "name": "Italian tactics",
+      "fen": "r1bqk2r/pppp1ppp/2n5/8/1bBPn3/2N2N2/PP3PPP/R1BQK2R w KQkq - 0 8",
+      "legalMoves": 39,
+      "returnedCandidates": 39,
+      "candidates": [
+        {
+          "depth": 7,
+          "move": "e1g1",
+          "score": -25
+        },
+        {
+          "depth": 7,
+          "move": "d4d5",
+          "score": -54
+        },
+        {
+          "depth": 7,
+          "move": "d1c2",
+          "score": -56
+        },
+        {
+          "depth": 7,
+          "move": "d1d3",
+          "score": -116
+        },
+        {
+          "depth": 7,
+          "move": "d1b3",
+          "score": -117
+        },
+        {
+          "depth": 7,
+          "move": "d1e2",
+          "score": -129
+        },
+        {
+          "depth": 7,
+          "move": "c1d2",
+          "score": -139
+        },
+        {
+          "depth": 7,
+          "move": "a2a3",
+          "score": -151
+        },
+        {
+          "depth": 7,
+          "move": "f3e5",
+          "score": -187
+        },
+        {
+          "depth": 7,
+          "move": "e1f1",
+          "score": -191
+        },
+        {
+          "depth": 7,
+          "move": "c4b3",
+          "score": -197
+        },
+        {
+          "depth": 7,
+          "move": "a1b1",
+          "score": -215
+        },
+        {
+          "depth": 7,
+          "move": "f3d2",
+          "score": -221
+        },
+        {
+          "depth": 7,
+          "move": "c1f4",
+          "score": -240
+        },
+        {
+          "depth": 7,
+          "move": "h2h4",
+          "score": -246
+        },
+        {
+          "depth": 7,
+          "move": "c4b5",
+          "score": -246
+        },
+        {
+          "depth": 7,
+          "move": "c4d3",
+          "score": -251
+        },
+        {
+          "depth": 7,
+          "move": "a2a4",
+          "score": -260
+        },
+        {
+          "depth": 7,
+          "move": "h2h3",
+          "score": -273
+        },
+        {
+          "depth": 7,
+          "move": "c4d5",
+          "score": -281
+        },
+        {
+          "depth": 7,
+          "move": "c1e3",
+          "score": -289
+        },
+        {
+          "depth": 7,
+          "move": "d1a4",
+          "score": -300
+        },
+        {
+          "depth": 7,
+          "move": "g2g3",
+          "score": -318
+        },
+        {
+          "depth": 7,
+          "move": "e1e2",
+          "score": -333
+        },
+        {
+          "depth": 7,
+          "move": "f3g5",
+          "score": -346
+        },
+        {
+          "depth": 7,
+          "move": "c4e2",
+          "score": -346
+        },
+        {
+          "depth": 7,
+          "move": "c4f7",
+          "score": -349
+        },
+        {
+          "depth": 7,
+          "move": "c1h6",
+          "score": -372
+        },
+        {
+          "depth": 7,
+          "move": "h1g1",
+          "score": -399
+        },
+        {
+          "depth": 7,
+          "move": "f3h4",
+          "score": -419
+        },
+        {
+          "depth": 7,
+          "move": "h1f1",
+          "score": -428
+        },
+        {
+          "depth": 7,
+          "move": "c4f1",
+          "score": -449
+        },
+        {
+          "depth": 7,
+          "move": "g2g4",
+          "score": -449
+        },
+        {
+          "depth": 7,
+          "move": "f3g1",
+          "score": -477
+        },
+        {
+          "depth": 7,
+          "move": "c4a6",
+          "score": -536
+        },
+        {
+          "depth": 7,
+          "move": "c1g5",
+          "score": -597
+        },
+        {
+          "depth": 7,
+          "move": "b2b3",
+          "score": -615
+        },
+        {
+          "depth": 7,
+          "move": "c4e6",
+          "score": -676
+        },
+        {
+          "depth": 7,
+          "move": "d1d2",
+          "score": -755
+        }
+      ]
+    },
+    {
+      "name": "Queens Gambit middlegame",
+      "fen": "rnbq1rk1/p1p1bpp1/1p2pn1p/3p4/2PP3B/2N1PN2/PP3PPP/R2QKB1R w KQ - 0 8",
+      "legalMoves": 38,
+      "returnedCandidates": 38,
+      "candidates": [
+        {
+          "depth": 7,
+          "move": "h4f6",
+          "score": 34
+        },
+        {
+          "depth": 7,
+          "move": "a1c1",
+          "score": 33
+        },
+        {
+          "depth": 7,
+          "move": "d1b3",
+          "score": 28
+        },
+        {
+          "depth": 7,
+          "move": "d1c2",
+          "score": 24
+        },
+        {
+          "depth": 7,
+          "move": "c4d5",
+          "score": 23
+        },
+        {
+          "depth": 7,
+          "move": "f1e2",
+          "score": 14
+        },
+        {
+          "depth": 7,
+          "move": "d1a4",
+          "score": 13
+        },
+        {
+          "depth": 7,
+          "move": "d1d2",
+          "score": 12
+        },
+        {
+          "depth": 7,
+          "move": "a1b1",
+          "score": 7
+        },
+        {
+          "depth": 7,
+          "move": "f3e5",
+          "score": 5
+        },
+        {
+          "depth": 7,
+          "move": "a2a4",
+          "score": 2
+        },
+        {
+          "depth": 7,
+          "move": "f1d3",
+          "score": 1
+        },
+        {
+          "depth": 7,
+          "move": "a2a3",
+          "score": 0
+        },
+        {
+          "depth": 7,
+          "move": "h4g3",
+          "score": 0
+        },
+        {
+          "depth": 7,
+          "move": "h2h3",
+          "score": -3
+        },
+        {
+          "depth": 7,
+          "move": "d1b1",
+          "score": -5
+        },
+        {
+          "depth": 7,
+          "move": "d1c1",
+          "score": -6
+        },
+        {
+          "depth": 7,
+          "move": "b2b3",
+          "score": -7
+        },
+        {
+          "depth": 7,
+          "move": "g2g4",
+          "score": -15
+        },
+        {
+          "depth": 7,
+          "move": "h1g1",
+          "score": -16
+        },
+        {
+          "depth": 7,
+          "move": "d1d3",
+          "score": -29
+        },
+        {
+          "depth": 7,
+          "move": "f3d2",
+          "score": -29
+        },
+        {
+          "depth": 7,
+          "move": "d1e2",
+          "score": -29
+        },
+        {
+          "depth": 7,
+          "move": "c3b5",
+          "score": -32
+        },
+        {
+          "depth": 7,
+          "move": "c3a4",
+          "score": -38
+        },
+        {
+          "depth": 7,
+          "move": "g2g3",
+          "score": -39
+        },
+        {
+          "depth": 7,
+          "move": "c3b1",
+          "score": -41
+        },
+        {
+          "depth": 7,
+          "move": "f3g1",
+          "score": -52
+        },
+        {
+          "depth": 7,
+          "move": "e1e2",
+          "score": -52
+        },
+        {
+          "depth": 7,
+          "move": "c3e2",
+          "score": -62
+        },
+        {
+          "depth": 7,
+          "move": "e1d2",
+          "score": -90
+        },
+        {
+          "depth": 7,
+          "move": "b2b4",
+          "score": -94
+        },
+        {
+          "depth": 7,
+          "move": "c4c5",
+          "score": -159
+        },
+        {
+          "depth": 7,
+          "move": "e3e4",
+          "score": -183
+        },
+        {
+          "depth": 7,
+          "move": "c3d5",
+          "score": -444
+        },
+        {
+          "depth": 7,
+          "move": "f3g5",
+          "score": -478
+        },
+        {
+          "depth": 7,
+          "move": "h4g5",
+          "score": -526
+        },
+        {
+          "depth": 7,
+          "move": "c3e4",
+          "score": -680
+        }
+      ]
+    },
+    {
+      "name": "Sicilian middlegame",
+      "fen": "rn1qk2r/1p2bppp/p2pbn2/4p3/4P3/1NN1BP2/PPP3PP/R2QKB1R w KQkq - 1 9",
+      "legalMoves": 47,
+      "returnedCandidates": 47,
+      "candidates": [
+        {
+          "depth": 7,
+          "move": "d1d2",
+          "score": 20
+        },
+        {
+          "depth": 7,
+          "move": "f1e2",
+          "score": 11
+        },
+        {
+          "depth": 7,
+          "move": "d1e2",
+          "score": 9
+        },
+        {
+          "depth": 7,
+          "move": "d1d3",
+          "score": 4
+        },
+        {
+          "depth": 7,
+          "move": "c3d5",
+          "score": 3
+        },
+        {
+          "depth": 7,
+          "move": "h2h4",
+          "score": -4
+        },
+        {
+          "depth": 7,
+          "move": "e3f2",
+          "score": -7
+        },
+        {
+          "depth": 7,
+          "move": "b3d2",
+          "score": -8
+        },
+        {
+          "depth": 7,
+          "move": "h2h3",
+          "score": -8
+        },
+        {
+          "depth": 7,
+          "move": "a2a3",
+          "score": -9
+        },
+        {
+          "depth": 7,
+          "move": "f1d3",
+          "score": -9
+        },
+        {
+          "depth": 7,
+          "move": "g2g3",
+          "score": -13
+        },
+        {
+          "depth": 7,
+          "move": "a2a4",
+          "score": -15
+        },
+        {
+          "depth": 7,
+          "move": "d1c1",
+          "score": -18
+        },
+        {
+          "depth": 7,
+          "move": "h1g1",
+          "score": -24
+        },
+        {
+          "depth": 7,
+          "move": "c3a4",
+          "score": -26
+        },
+        {
+          "depth": 7,
+          "move": "e3g5",
+          "score": -27
+        },
+        {
+          "depth": 7,
+          "move": "a1c1",
+          "score": -29
+        },
+        {
+          "depth": 7,
+          "move": "a1b1",
+          "score": -29
+        },
+        {
+          "depth": 7,
+          "move": "e3g1",
+          "score": -31
+        },
+        {
+          "depth": 7,
+          "move": "b3c1",
+          "score": -46
+        },
+        {
+          "depth": 7,
+          "move": "d1b1",
+          "score": -47
+        },
+        {
+          "depth": 7,
+          "move": "e1f2",
+          "score": -48
+        },
+        {
+          "depth": 7,
+          "move": "e1d2",
+          "score": -48
+        },
+        {
+          "depth": 7,
+          "move": "e3d2",
+          "score": -49
+        },
+        {
+          "depth": 7,
+          "move": "g2g4",
+          "score": -53
+        },
+        {
+          "depth": 7,
+          "move": "e3c1",
+          "score": -53
+        },
+        {
+          "depth": 7,
+          "move": "e1e2",
+          "score": -56
+        },
+        {
+          "depth": 7,
+          "move": "f3f4",
+          "score": -95
+        },
+        {
+          "depth": 7,
+          "move": "c3e2",
+          "score": -133
+        },
+        {
+          "depth": 7,
+          "move": "c3b1",
+          "score": -155
+        },
+        {
+          "depth": 7,
+          "move": "b3d4",
+          "score": -465
+        },
+        {
+          "depth": 7,
+          "move": "e3c5",
+          "score": -559
+        },
+        {
+          "depth": 7,
+          "move": "f1c4",
+          "score": -583
+        },
+        {
+          "depth": 7,
+          "move": "b3c5",
+          "score": -587
+        },
+        {
+          "depth": 7,
+          "move": "c3b5",
+          "score": -602
+        },
+        {
+          "depth": 7,
+          "move": "e3d4",
+          "score": -610
+        },
+        {
+          "depth": 7,
+          "move": "f1a6",
+          "score": -614
+        },
+        {
+          "depth": 7,
+          "move": "b3a5",
+          "score": -642
+        },
+        {
+          "depth": 7,
+          "move": "f1b5",
+          "score": -650
+        },
+        {
+          "depth": 7,
+          "move": "e3h6",
+          "score": -661
+        },
+        {
+          "depth": 7,
+          "move": "d1d6",
+          "score": -668
+        },
+        {
+          "depth": 7,
+          "move": "e3a7",
+          "score": -688
+        },
+        {
+          "depth": 7,
+          "move": "d1d5",
+          "score": -693
+        },
+        {
+          "depth": 7,
+          "move": "d1d4",
+          "score": -699
+        },
+        {
+          "depth": 7,
+          "move": "e3f4",
+          "score": -716
+        },
+        {
+          "depth": 7,
+          "move": "e3b6",
+          "score": -769
+        }
+      ]
+    },
+    {
+      "name": "Rook ending",
+      "fen": "8/5pk1/6p1/3R3p/2P5/6P1/5PKP/6r1 w - - 0 35",
+      "legalMoves": 3,
+      "returnedCandidates": 3,
+      "candidates": [
+        {
+          "depth": 7,
+          "move": "g2g1",
+          "score": 532
+        },
+        {
+          "depth": 7,
+          "move": "g2f3",
+          "score": 21
+        },
+        {
+          "depth": 7,
+          "move": "g2h3",
+          "score": -4
+        }
+      ]
+    },
+    {
+      "name": "Pawn ending",
+      "fen": "8/5pk1/6p1/7p/2P5/6P1/5PKP/8 w - - 0 35",
+      "legalMoves": 11,
+      "returnedCandidates": 11,
+      "candidates": [
+        {
+          "depth": 7,
+          "move": "g2f3",
+          "score": 390
+        },
+        {
+          "depth": 7,
+          "move": "h2h3",
+          "score": 371
+        },
+        {
+          "depth": 7,
+          "move": "h2h4",
+          "score": 362
+        },
+        {
+          "depth": 7,
+          "move": "g2f1",
+          "score": 360
+        },
+        {
+          "depth": 7,
+          "move": "f2f4",
+          "score": 341
+        },
+        {
+          "depth": 7,
+          "move": "f2f3",
+          "score": 312
+        },
+        {
+          "depth": 7,
+          "move": "g2h3",
+          "score": 307
+        },
+        {
+          "depth": 7,
+          "move": "g2g1",
+          "score": 300
+        },
+        {
+          "depth": 7,
+          "move": "c4c5",
+          "score": 261
+        },
+        {
+          "depth": 7,
+          "move": "g2h1",
+          "score": 208
+        },
+        {
+          "depth": 7,
+          "move": "g3g4",
+          "score": 95
+        }
+      ]
+    },
+    {
+      "name": "Hanging queen tactic",
+      "fen": "4k3/8/8/3q4/4P3/8/8/4K3 w - - 0 1",
+      "legalMoves": 5,
+      "returnedCandidates": 5,
+      "candidates": [
+        {
+          "depth": 7,
+          "move": "e4d5",
+          "score": 12
+        },
+        {
+          "depth": 7,
+          "move": "e1e2",
+          "score": -673
+        },
+        {
+          "depth": 7,
+          "move": "e1f1",
+          "score": -687
+        },
+        {
+          "depth": 7,
+          "move": "e4e5",
+          "score": -693
+        },
+        {
+          "depth": 7,
+          "move": "e1f2",
+          "score": -696
+        }
+      ]
+    }
+  ]
+}

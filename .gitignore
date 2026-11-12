@@ -1,0 +1,7 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+public/engine/
+public/licenses/
+public/app-source.tar.gz

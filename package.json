@@ -1,0 +1,28 @@
+{
+  "name": "quiet-knight",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "node scripts/prepare-engine.mjs && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "calibrate": "node scripts/calibrate.mjs"
+  },
+  "dependencies": {
+    "chess.js": "1.4.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "stockfish": "19.0.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@vitejs/plugin-react": "5.1.1",
+    "vite": "7.3.8",
+    "vite-plugin-pwa": "1.1.0",
+    "vitest": "4.1.12"
+  }
+}

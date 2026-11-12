@@ -131,3 +131,37 @@ The implementation routes click and drag requests through one promotion entry po
 The first correction passed 39 core tests and all 50 browser tests, including the two reproduced pause/timeout regressions. A follow-up strengthened mobile coverage to activate promotion choices through touch rather than mouse clicks. Tap-to-move plus tap-choice passed for both colors. Touch-drag plus an immediate touch-choice failed for both colors. The reviewer used one CDP touch stream throughout; no mixed gesture API or delay was required. An event trace showed pointerdown, touchstart, pointerup, and touchend on the intended promotion button, but no click event. The existing click-only handler did not run. The direct touch correction passed eight focused browser tests: four true-touch capture promotion cases, moved-out and cancelled touches, keyboard Enter and Space, and duplicate compatibility-click consumption. The same touch session now performs the drag and the immediate piece-choice tap with no artificial delay. The corrected selector handles touch/pen pointer release directly, validates the initial press, movement distance and release bounds, and consumes a promotion once. Mouse clicks and keyboard activation remain supported. The final compatibility-click guard passed the full suite at BASE_PATH=/chess/: 54 browser tests, including 42 promotion regressions. The core suite passed 39 tests. The production build passed.
 
 Review limit: browser touch emulation was checked at 390x844. Physical phone and pen input were not checked.
+
+## Editorial redesign review — November 12, 2026
+
+### Acceptance checklist and findings
+
+The independent reviewer added `tests/browser/design.spec.js` and ran its 11 checks against the production build at `BASE_PATH=/chess/`. All 11 passed with `npx playwright test tests/browser/design.spec.js`.
+
+- [x] Rendered and inspected screenshots at 1440x1000, 1024x768, 768x1024, 390x844, and 320x740. The board remains the primary element. Both clocks occupy the secondary desktop column and follow the board on mobile. No horizontal overflow occurred.
+- [x] Checked square board geometry, minimum board width, readable clock sizes, and tabular clock numerals. The desktop board fits inside the initial viewport at both tested desktop sizes.
+- [x] Checked the new-game, import, promotion, and engine-review views. The promotion selector shows Queen, Rook, Bishop, and Knight at 320px. Compact controls, neutral separators, cobalt accents, and text hierarchy continue across these views.
+- [x] Checked loaded font faces and computed typography. A separate Chrome DevTools font audit inspected actual rendered glyph fonts in headings, clocks, primary controls, file controls, captions, branding, and footer text. Those audited glyphs use custom Inter fonts.
+- [x] Cleared the browser HTTP cache and reloaded offline after the service worker took control. Inter remained loaded offline.
+- [x] Checked visible text contrast at 4.5:1 for normal text and 3:1 for large text. The automated helper excludes disabled controls and SVG text; it compares each text color with its effective solid background.
+- [x] Checked legal-move dots, capture rings, and keyboard focus against board squares at 3:1. Inspected SVG pieces, selected squares, check highlighting, and analysis graphics visually.
+- [x] Checked visible keyboard focus, Escape dismissal, modal overflow, and narrow-screen promotion controls. The new-game dialog scrolls internally at 320x740.
+- [x] Ran real-engine review of a completed four-ply game, checked four analysis rows, and inspected desktop and mobile analysis screenshots.
+
+The first render exposed desktop board overflow: the board extended below the initial 1440x1000 and 1024x768 viewports. The implementation agent changed the desktop grid sizing and short-height spacing. The repeated viewport checks passed, and the updated screenshots show the complete board.
+
+The initial legal-move dots and capture/focus outlines had insufficient contrast on dark squares. The implementation agent changed those indicators to opaque ink and added a contrasting halo to the hint outline. The repeated nontext contrast check passed.
+
+Computed font-family checks initially concealed fallback glyphs. The actual-font audit found Arial for the infinity and arrow characters and Segoe UI Symbol for diagonal file-action arrows. The implementation agent replaced the visible infinity and navigation arrows with SVG and removed decorative file-action arrows. The repeated actual-font audit found only custom Inter in the audited text nodes.
+
+### Evidence and scope
+
+Screenshots are under `test-results/design-*.png`, including the five viewport captures, new-game/import/promotion dialogs, and desktop/mobile review. The reviewer inspected the generated screenshots rather than relying only on layout assertions. The final focused command passed 11 tests in 12.2 seconds.
+
+The reviewer read relevant portions of `src/App.jsx`, `src/style.css`, `src/Piece.jsx`, `src/Icon.jsx`, `vite.config.js`, and `scripts/prepare-engine.mjs`. The generated third-party notice includes the Inter OFL attribution. The generated service worker includes the bundled Inter WOFF2 asset. Existing engine licensing notices remain in the distribution; this review does not establish independent legal compliance or reproduce the engine build.
+
+Final local implementation checks passed: 39 core tests, the production build at BASE_PATH=/chess/, and all 65 browser tests. The browser suite includes 42 promotion regressions, 11 design checks, and 12 existing application checks. A source comparison confirmed the gameplay state and handler block is unchanged. Deployment is checked separately by the implementation agent.
+
+### Limits
+
+The review used desktop Chromium and emulated mobile viewport sizes. Physical phones, pen input, Safari, Firefox, native installation, screen readers, and live GitHub Pages were not checked in this redesign review. The contrast assertions cover the app's tested solid backgrounds and selected interaction states, not every possible composed visual state. The actual-font audit covers named visible text nodes; it does not inspect every possible imported string or non-Latin glyph.

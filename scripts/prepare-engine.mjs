@@ -43,6 +43,7 @@ for (const name of [
   "react-dom",
   "scheduler",
   "chess.js",
+  "@fontsource-variable/inter",
   "workbox-window",
   "workbox-core",
   "workbox-routing",

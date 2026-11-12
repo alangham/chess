@@ -21,17 +21,24 @@ import {
   loadSession,
 } from "./chess.js";
 import { analyze, uciMove } from "./engine.js";
-const GLYPHS = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" },
-  NAMES = {
-    p: "pawn",
-    n: "knight",
-    b: "bishop",
-    r: "rook",
-    q: "queen",
-    k: "king",
-  };
+import Piece from "./Piece.jsx";
+import Icon from "./Icon.jsx";
+const NAMES = {
+  p: "pawn",
+  n: "knight",
+  b: "bishop",
+  r: "rook",
+  q: "queen",
+  k: "king",
+};
 function clockText(ms, untimed) {
-  if (untimed) return "∞";
+  if (untimed)
+    return (
+      <>
+        <span className="sr-only">Untimed</span>
+        <Icon name="infinity" />
+      </>
+    );
   const s = Math.max(0, Math.ceil(ms / 1000));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
@@ -623,7 +630,9 @@ export default function App() {
       <div
         className={`player ${turn === color && !session.result ? "active" : ""}`}
       >
-        <div className={`avatar ${bot ? "bot" : ""}`}>{bot ? "♞" : "♙"}</div>
+        <div className={`avatar ${bot ? "bot" : ""}`}>
+          <Piece type={bot ? "n" : "p"} color={color} />
+        </div>
         <div className="player-details">
           <strong>
             {bot ? "Stockfish" : "You"}{" "}
@@ -639,7 +648,9 @@ export default function App() {
           </strong>
           <div className="captured">
             {captured.map((p, i) => (
-              <span key={i}>{GLYPHS[p]}</span>
+              <span key={i}>
+                <Piece type={p} color={color === "w" ? "b" : "w"} />
+              </span>
             ))}
             {advantage > 0 && <small>+{advantage}</small>}
             {!captured.length && (
@@ -662,9 +673,11 @@ export default function App() {
     <div className="app">
       <header>
         <a className="brand" href={import.meta.env.BASE_URL}>
-          <span className="brand-mark">♞</span>
+          <span className="brand-mark">
+            <Piece type="n" color="w" />
+          </span>
           <span>
-            Quiet Knight<small>CHESS, AT YOUR PACE</small>
+            Quiet Knight<small>PLAY / STUDY / REPEAT</small>
           </span>
         </a>
         <div className="header-right">
@@ -688,29 +701,22 @@ export default function App() {
       <main>
         <div className="intro">
           <div>
-            <p className="eyebrow">A LITTLE FOCUS. A BETTER NEXT MOVE.</p>
+            <p className="eyebrow">01 / THE PLAYING ROOM</p>
             <h1>Your move.</h1>
           </div>
           <button className="primary" onClick={() => setModal("new")}>
-            New game <span>＋</span>
+            New game <span aria-hidden="true">+</span>
           </button>
         </div>
         <div className="game-layout">
           <section className="play-area" aria-label="Chess game">
-            {playerCard(session.human === "w" ? "b" : "w")}
+            <div className="board-caption">
+              <span>THE BOARD</span>
+              <span>
+                {session.human === "w" ? "YOU PLAY WHITE" : "YOU PLAY BLACK"}
+              </span>
+            </div>
             <div className="board-wrap">
-              {session.settings.evaluation && (
-                <div
-                  className="eval-bar"
-                  aria-label={`Evaluation ${evaluation === null ? "loading" : scoreLabel(evaluation)}`}
-                >
-                  <div
-                    style={{
-                      height: `${50 + 45 * Math.tanh((evaluation || 0) / 500)}%`,
-                    }}
-                  />
-                </div>
-              )}
               <div className="board" role="group" aria-label="Chessboard">
                 {ranks.flatMap((rank, row) =>
                   [...files].map((file, col) => {
@@ -776,7 +782,7 @@ export default function App() {
                           <span
                             className={`piece ${p.color === "w" ? "white-piece" : "black-piece"}`}
                           >
-                            {GLYPHS[p.type]}
+                            <Piece type={p.type} color={p.color} />
                           </span>
                         )}
                         {isLegal && (
@@ -788,84 +794,109 @@ export default function App() {
                 )}
               </div>
             </div>
-            {playerCard(session.human)}
-            <div className="game-status" role="status">
-              <span className={`status-dot ${thinking ? "pulse" : ""}`} />
-              {session.result ||
-                (replaying
-                  ? `Replay · position ${cursor} of ${history.length}`
-                  : paused
-                    ? "Game paused · take your time"
-                    : thinking
-                      ? "Stockfish is thinking…"
-                      : turn === session.human
-                        ? "Your turn. Find your next move."
-                        : "Stockfish to move.")}
+            <div className="board-caption board-bottom">
+              <span>FOCUS ON THE NEXT MOVE.</span>
+              <span>{replaying ? "REPLAY" : "LOCAL / PRIVATE"}</span>
             </div>
-            {paused && !session.result && !replaying && (
-              <button
-                className="primary resume"
-                onClick={() => {
-                  setPaused(false);
-                  setError("");
-                  setRevision((v) => v + 1);
-                }}
-              >
-                {history.length ? "Resume game" : "Start playing"}{" "}
-                <span>▶</span>
-              </button>
-            )}
-            <div className="board-actions">
-              <button
-                disabled={
-                  !session.settings.undo ||
-                  !undoCount(game, session.human) ||
-                  !!session.result
-                }
-                onClick={undo}
-              >
-                ↶ Undo
-              </button>
-              <button disabled={!canMove || thinking} onClick={requestHint}>
-                ◇ Hint
-              </button>
-              <button
-                disabled={!!session.result || replaying}
-                onClick={() => setPaused((v) => !v)}
-              >
-                {paused ? "▶ Resume" : "Ⅱ Pause"}
-              </button>
-              <button
-                disabled={!!session.result}
-                onClick={() => setModal("resign")}
-              >
-                Resign
-              </button>
-            </div>
-            {hint && (
-              <p className="note">
-                Try <strong>{hint.san}</strong>: {hint.from} to {hint.to}.
-              </p>
-            )}
-            {session.settings.evaluation && (
-              <p className="note">
-                Engine evaluation:{" "}
-                {evaluation === null ? "Calculating…" : scoreLabel(evaluation)}{" "}
-                · White’s perspective
-              </p>
-            )}
           </section>
-          <aside>
+          <aside aria-label="Game details">
+            <section
+              className="session-panel"
+              aria-label="Players and controls"
+            >
+              <div className="players">
+                {playerCard(session.human === "w" ? "b" : "w")}
+                {playerCard(session.human)}
+              </div>
+              <div className="game-status" role="status">
+                <span className={`status-dot ${thinking ? "pulse" : ""}`} />
+                {session.result ||
+                  (replaying
+                    ? `Replay · position ${cursor} of ${history.length}`
+                    : paused
+                      ? "Game paused · take your time"
+                      : thinking
+                        ? "Stockfish is thinking…"
+                        : turn === session.human
+                          ? "Your turn. Find your next move."
+                          : "Stockfish to move.")}
+              </div>
+              {paused && !session.result && !replaying && (
+                <button
+                  className="primary resume"
+                  onClick={() => {
+                    setPaused(false);
+                    setError("");
+                    setRevision((v) => v + 1);
+                  }}
+                >
+                  {history.length ? "Resume game" : "Start playing"} <Icon />
+                </button>
+              )}
+              <div className="board-actions">
+                <button
+                  disabled={
+                    !session.settings.undo ||
+                    !undoCount(game, session.human) ||
+                    !!session.result
+                  }
+                  onClick={undo}
+                >
+                  Undo
+                </button>
+                <button disabled={!canMove || thinking} onClick={requestHint}>
+                  Hint
+                </button>
+                <button
+                  disabled={!!session.result || replaying}
+                  onClick={() => setPaused((v) => !v)}
+                >
+                  {paused ? "Resume" : "Pause"}
+                </button>
+                <button
+                  disabled={!!session.result}
+                  onClick={() => setModal("resign")}
+                >
+                  Resign
+                </button>
+              </div>
+              {hint && (
+                <p className="note">
+                  Try <strong>{hint.san}</strong>: {hint.from} to {hint.to}.
+                </p>
+              )}
+              {session.settings.evaluation && (
+                <div
+                  className="eval-bar"
+                  aria-label={`Evaluation ${evaluation === null ? "loading" : scoreLabel(evaluation)}`}
+                >
+                  <div
+                    style={{
+                      width: `${50 + 45 * Math.tanh((evaluation || 0) / 500)}%`,
+                    }}
+                  />
+                </div>
+              )}
+              {session.settings.evaluation && (
+                <p className="note evaluation-note">
+                  Engine evaluation:{" "}
+                  {evaluation === null
+                    ? "Calculating…"
+                    : scoreLabel(evaluation)}{" "}
+                  · White’s perspective
+                </p>
+              )}
+            </section>
             <section className="panel game-panel">
               <div className="panel-heading">
-                <span className="eyebrow">THE CURRENT GAME</span>
+                <span className="eyebrow">02 / GAME RECORD</span>
                 <span className="time-tag">{session.settings.time}</span>
               </div>
               <h2>{opening(game)}</h2>
               <p className="muted">
                 {history.length
                   ? `${Math.ceil(history.length / 2)} moves into the story`
-                  : "Every game starts with a possibility."}
+                  : "A new game. A fresh perspective."}
               </p>
               <div className="tabs">
                 <button
@@ -885,7 +916,9 @@ export default function App() {
                 <div className="move-list">
                   {!history.length ? (
                     <div className="empty">
-                      <span>♟</span>
+                      <span>
+                        <Piece type="p" color="w" />
+                      </span>
                       <strong>A fresh board.</strong>
                       <p>
                         Your moves will appear here.
@@ -936,11 +969,11 @@ export default function App() {
                           y1="45"
                           x2="300"
                           y2="45"
-                          stroke="#b8c7bc"
+                          stroke="var(--line)"
                         />
                         <polyline
                           fill="none"
-                          stroke="#426d59"
+                          stroke="var(--accent)"
                           strokeWidth="2.5"
                           points={review
                             .map(
@@ -1009,7 +1042,7 @@ export default function App() {
                     setCursor(0);
                   }}
                 >
-                  Ⅰ◀
+                  First
                 </button>
                 <button
                   aria-label="Previous move"
@@ -1019,7 +1052,7 @@ export default function App() {
                     setCursor(Math.max(0, (cursor ?? history.length) - 1));
                   }}
                 >
-                  ◀
+                  Prev
                 </button>
                 <button
                   aria-label="Next move"
@@ -1028,7 +1061,7 @@ export default function App() {
                     setCursor(Math.min(history.length, cursor + 1))
                   }
                 >
-                  ▶
+                  Next
                 </button>
                 <button
                   aria-label="Last position"
@@ -1038,7 +1071,7 @@ export default function App() {
                     setCursor(history.length);
                   }}
                 >
-                  ▶Ⅰ
+                  Last
                 </button>
               </div>
               {replaying && (
@@ -1053,7 +1086,7 @@ export default function App() {
               )}
             </section>
             <section className="panel small-panel">
-              <h3>Make it your game</h3>
+              <h3>03 / PREFERENCES & FILES</h3>
               <label className="toggle">
                 <span>
                   Show engine evaluation
@@ -1071,14 +1104,14 @@ export default function App() {
                 />
               </label>
               <div className="file-actions">
-                <button onClick={exportPgn}>Export PGN ↗</button>
+                <button onClick={exportPgn}>Export PGN</button>
                 <button
                   onClick={() => {
                     setError("");
                     setModal("import");
                   }}
                 >
-                  Import game ↙
+                  Import game
                 </button>
               </div>
               <button
@@ -1089,9 +1122,9 @@ export default function App() {
               </button>
             </section>
             <div className="quiet-note">
-              <span>✧</span>
+              <span className="save-mark" aria-hidden="true" />
               <p>
-                No account. No rush. Just chess.
+                A place to think.
                 <small>
                   {storageError
                     ? "Saving unavailable. Export PGN before leaving."
@@ -1217,7 +1250,7 @@ export default function App() {
                           choosePromotion(p);
                       }}
                     >
-                      {GLYPHS[p]}
+                      <Piece type={p} color={session.human} />
                       <small>{NAMES[p]}</small>
                     </button>
                   ))}
@@ -1314,7 +1347,7 @@ export default function App() {
                   />
                 </label>
                 <button className="primary full" onClick={start}>
-                  Let’s play <span>→</span>
+                  Let’s play <Icon />
                 </button>
               </>
             ) : modal === "import" ? (
@@ -1401,8 +1434,9 @@ export default function App() {
                 </p>
                 <p>
                   Rules: chess.js 1.4.0, BSD-2-Clause. Engine: Stockfish.js
-                  19.0.1, GPL-3.0. Interface: React, MIT. Piece symbols use your
-                  device’s chess font.
+                  19.0.1, GPL-3.0. Interface: React, MIT. Typography: Inter, SIL
+                  Open Font License. Chess pieces are original inline SVG
+                  artwork.
                 </p>
                 <p>
                   This app is GPL-3.0-or-later. The engine is distributed

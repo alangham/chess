@@ -13,8 +13,8 @@ export default defineConfig({
         short_name: "Quiet Knight",
         description:
           "Private, offline chess with a thoughtful engine opponent.",
-        theme_color: "#172b26",
-        background_color: "#f4f1e9",
+        theme_color: "#171717",
+        background_color: "#F7F7F5",
         display: "standalone",
         icons: [
           { src: "icon-192.png", sizes: "192x192", type: "image/png" },
@@ -29,7 +29,7 @@ export default defineConfig({
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 20000000,
-        globPatterns: ["**/*.{js,css,html,svg,wasm,txt}"],
+        globPatterns: ["**/*.{js,css,html,svg,wasm,txt,woff,woff2}"],
         navigateFallback: "index.html",
       },
     }),

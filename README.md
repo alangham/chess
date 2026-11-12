@@ -64,7 +64,7 @@ Application code is GPL-3.0-or-later. See LICENSE. React/react-dom/scheduler are
 
 About provides source/license links. Preserve these files and access when redistributing. To rebuild the engine, use Emscripten 6.0.9, Node/npm, make, a POSIX shell, curl/wget and sha256sum. Extract source, copy the NNUE to `src/`, install its dependencies, and run `./build.js --lite --single-threaded`. Follow the archived README/build.js/Makefile for complete options. The app build uses upstream prebuilt binaries; an engine rebuild was not performed during app development.
 
-Chess symbols use the operating system font. No third-party artwork or sound recordings are included.
+Typography uses locally bundled Inter through @fontsource-variable/inter 5.3.0 under the SIL Open Font License, including offline font caching and notices. Chess pieces are original inline SVG artwork. No third-party artwork or sound recordings are included.
 
 ## Relative-strength evidence
 
@@ -73,3 +73,7 @@ Chess symbols use the operating system font. No third-party artwork or sound rec
 ## Development advisory status
 
 Runtime auditing returned zero advisories. A full audit retained five low/moderate entries in the Workbox build dependency chain after compatible updates. The affected build tools are not shipped as runtime application modules. Run `npm audit` to get the current advisory details before changing dependency versions.
+
+## Visual system
+
+The editorial interface uses local Inter typography, warm off-white, near-black, neutral grays, and cobalt accents. `src/style.css` owns reusable color, type, spacing, border, focus, and interaction tokens. At widths of 960px and above, the board occupies the left track and clocks, controls, evaluation, and the game record occupy the right track. Desktop width also accounts for viewport height so the complete board stays visible at the tested sizes. Narrower layouts stack the board before the secondary modules. `src/Piece.jsx` and `src/Icon.jsx` provide original SVG artwork without glyph-font fallback.

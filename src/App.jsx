@@ -9,6 +9,7 @@ import {
   undoSession,
   undoCount,
   gameResult,
+  gameHeading,
   timeoutResult,
   difficulty,
   selectCandidate,
@@ -702,7 +703,9 @@ export default function App() {
         <div className="intro">
           <div>
             <p className="eyebrow">01 / THE PLAYING ROOM</p>
-            <h1>Your move.</h1>
+            <h1 aria-live="polite" aria-atomic="true">
+              {gameHeading(game, session.human, session.result)}
+            </h1>
           </div>
           <button className="primary" onClick={() => setModal("new")}>
             New game <span aria-hidden="true">+</span>
@@ -731,6 +734,9 @@ export default function App() {
                       <button
                         key={square}
                         data-square={square}
+                        data-draggable={
+                          canMove && p?.color === session.human ? "true" : undefined
+                        }
                         aria-label={`${square}${p ? ` ${p.color === "w" ? "white" : "black"} ${NAMES[p.type]}` : ""}`}
                         aria-pressed={selected === square}
                         className={`square ${(file.charCodeAt(0) + rank) % 2 ? "light" : "dark"} ${last && (last.from === square || last.to === square) ? "last" : ""} ${selected === square ? "selected" : ""} ${check ? "check" : ""} ${hint?.to === square ? "hint" : ""}`}

@@ -68,8 +68,23 @@
 * {
   box-sizing: border-box;
 }
+html {
+  min-height: 100%;
+  overflow-y: auto;
+}
+body,
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  overflow: visible;
+}
 body {
   margin: 0;
+}
+#root {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
 }
 button,
 input,
@@ -300,7 +315,7 @@ main {
   border: 1px solid var(--ink);
   border-radius: 1px;
   overflow: hidden;
-  touch-action: none;
+  touch-action: pan-y pinch-zoom;
   user-select: none;
 }
 .square {
@@ -312,9 +327,13 @@ main {
   position: relative;
   display: grid;
   place-items: center;
-  touch-action: none;
+  touch-action: pan-y pinch-zoom;
   transition: background var(--transition);
   isolation: isolate;
+}
+/* Only a playable piece owns a drag; the rest of the board scrolls the page. */
+.square[data-draggable="true"] {
+  touch-action: none;
 }
 .square.light {
   background: var(--square-light);
@@ -958,7 +977,11 @@ footer button:hover:not(:disabled) {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  --dialog-gutter: 24px;
+  padding: calc(var(--dialog-gutter) + env(safe-area-inset-top, 0px))
+    calc(var(--dialog-gutter) + env(safe-area-inset-right, 0px))
+    calc(var(--dialog-gutter) + env(safe-area-inset-bottom, 0px))
+    calc(var(--dialog-gutter) + env(safe-area-inset-left, 0px));
   overflow: auto;
   backdrop-filter: blur(2px);
 }
@@ -966,7 +989,10 @@ footer button:hover:not(:disabled) {
   position: relative;
   width: 440px;
   max-width: 100%;
-  max-height: calc(100dvh - 48px);
+  max-height: calc(100vh - 2 * var(--dialog-gutter) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 2 * var(--dialog-gutter) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  min-height: 0;
+  flex-shrink: 0;
   overflow: auto;
   background: var(--paper);
   border: 1px solid var(--ink);
@@ -1346,11 +1372,10 @@ footer button:hover:not(:disabled) {
     font-size: 22px;
   }
   .modal-backdrop {
-    padding: 16px;
+    --dialog-gutter: 16px;
   }
   .modal {
     padding: 28px 22px;
-    max-height: calc(100dvh - 32px);
   }
   .modal h2 {
     font-size: 27px;
@@ -1387,6 +1412,11 @@ footer button:hover:not(:disabled) {
   }
   .footer-dot {
     margin: 0 4px;
+  }
+}
+@media (max-width: 360px) {
+  .intro h1 {
+    font-size: 36px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

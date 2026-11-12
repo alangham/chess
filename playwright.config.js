@@ -18,6 +18,11 @@ export default defineConfig({
   },
   projects: [
     {
+      name: "webkit-mobile",
+      testMatch: "mobile-state.spec.js",
+      use: { browserName: "webkit", isMobile: true, hasTouch: true },
+    },
+    {
       name: "chromium",
       use: {
         browserName: "chromium",

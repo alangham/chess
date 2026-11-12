@@ -51,6 +51,22 @@ export function gameResult(game) {
   if (game.isDrawByFiftyMoves()) return "Draw by fifty-move rule";
   return null;
 }
+// Board end conditions take precedence over a saved result or the side to move.
+export function gameHeading(game, human, result = null) {
+  const ended = gameResult(game) || result;
+  if (ended) {
+    if (ended.startsWith("Draw")) return "It's a draw.";
+    const winner = ended.startsWith("White")
+      ? "w"
+      : ended.startsWith("Black")
+        ? "b"
+        : null;
+    if (winner === human) return "You won.";
+    if (winner && ended.includes("resignation")) return "You resigned.";
+    return "Game over.";
+  }
+  return game.turn() === human ? "Your move." : "Thinking...";
+}
 export function timeoutResult(game, loser) {
   if (game.isInsufficientMaterial())
     return "Draw on time — opponent cannot checkmate";

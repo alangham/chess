@@ -165,3 +165,29 @@ Final local implementation checks passed: 39 core tests, the production build at
 ### Limits
 
 The review used desktop Chromium and emulated mobile viewport sizes. Physical phones, pen input, Safari, Firefox, native installation, screen readers, and live GitHub Pages were not checked in this redesign review. The contrast assertions cover the app's tested solid backgrounds and selected interaction states, not every possible composed visual state. The actual-font audit covers named visible text nodes; it does not inspect every possible imported string or non-Latin glyph.
+
+
+## Mobile scrolling and terminal heading review
+
+The independent reviewer added `tests/browser/mobile-state.spec.js`. Its 32 cases run in Chromium and mobile WebKit; one Chromium CDP touch case skips in WebKit. The acceptance checklist covers:
+
+- Authoritative chess.js checkmate outcomes for White and Black human wins and bot wins, including a stale contradictory saved result.
+- Stalemate, insufficient material, fifty-move and repetition draws; persisted timeout and resignation outcomes for both sides.
+- Live transitions after White and Black checkmating moves, human timeout, bot timeout, confirmed human resignation, and a stalemate move.
+- Starting a new game after each human checkmate clears the terminal heading and result.
+- Reaching all header, main, and footer controls outside the board through document scrolling at 390x664, 320x568, 844x390, and 667x320. The check includes disabled controls and confirms each control's center is not obscured.
+- Changing viewport height on the same loaded page before repeating control reachability, as a proxy for browser toolbar expansion and collapse.
+- Inspecting html, body, #root, and main for clipping overflow or fixed positioning; checking no horizontal overflow.
+- Constraining the game-settings dialog to the viewport and exposing its final action through internal scrolling; promotion choices fit both narrow portrait and short landscape viewports.
+- A Chromium CDP touch swipe starting on an empty board square scrolls the document; existing promotion regressions retain touch-piece-drag coverage.
+
+The reviewer found both `.board` and `.square` used `touch-action: none`, preventing browser scrolling from board gestures. The implementation now permits vertical panning except on a human piece that can be dragged. The reviewer read the heading helper and confirmed it consults `gameResult(game)` before the stored timeout/resignation result and side to move. The heading source is the live game, not the replay position.
+
+The initial focused run passed 53 cases and skipped the CDP-only case in WebKit. Four WebKit scrolling checks initially failed because Playwright does not support mouse-wheel input in mobile WebKit. The reviewer changed those checks to keyboard document scrolling; all eight scrolling checks then passed across Chromium and WebKit. The complete final suite is recorded separately after the final additions and production build.
+
+Review limits: WebKit runs on Windows with a mobile browser profile, not on a physical iPhone or actual Safari. Chromium scrolling uses wheel input and one real CDP touch stream; WebKit scrolling uses keyboard input. The tests do not reproduce Safari's dynamic toolbar, hardware notch, home indicator, on-screen keyboard, or native touch inertia. CSS safe-area declarations were inspected, but nonzero hardware insets were not observed. Physical iPhone Safari portrait and landscape acceptance remains untested.
+
+
+Narrow heading follow-up: the implementation agent observed `Thinking...` expanding the 320px document to 323px. The independent reviewer added seven state-based browser cases at 320x568. They cover every requested state label, including both resignation outcomes, and check page width, heading bounds, and separation from the New game control after Inter loads. The implementation reduces the heading size only at widths up to 360px. These added cases await the final full-suite run; the reviewer did not run a separate focused command for this addition.
+
+Final verification: `npm test` passed 39 core tests. The production build with `BASE_PATH=/chess/` passed. `BASE_PATH=/chess/ npm run test:e2e` passed 142 browser tests with one expected WebKit skip for the Chromium-only CDP gesture. This includes all 42 promotion regressions, the 11 existing design checks, and the new 39-case mobile/state matrix in both engines. All seven 320px heading cases passed without overflow or control overlap. The reviewer inspected the 320x568 and 667x320 WebKit dialog captures. Physical iPhone Safari remains untested.

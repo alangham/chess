@@ -89,6 +89,9 @@ export default function App() {
   const actionRef = useRef(null),
     reviewRef = useRef(null),
     pointer = useRef(null),
+    promotionPress = useRef(null),
+    promotionSubmitted = useRef(false),
+    promotionTouchHandled = useRef(false),
     lastTick = useRef(performance.now());
   const game = useMemo(
       () => fromSession(session),
@@ -116,6 +119,7 @@ export default function App() {
     !session.result &&
     !replaying &&
     !reviewBusy &&
+    !promotion &&
     turn === session.human;
   const playContext = useRef({ paused, replaying, reviewBusy });
   playContext.current = { paused, replaying, reviewBusy };
@@ -225,14 +229,33 @@ export default function App() {
     }, 100);
     return () => clearInterval(id);
   }, [paused, session.result, fen, replaying, untimed]);
-  function play(move) {
+  useEffect(() => {
+    if (session.result || (promotion && promotion.fen !== fen)) {
+      setPromotion(null);
+      setSelected(null);
+    }
+  }, [session.result, fen, promotion]);
+  function play(move, { completePromotion = false } = {}) {
     try {
       const current = sessionRef.current,
         g = fromSession(current),
         context = playContext.current;
+      const validPromotion =
+        completePromotion &&
+        promotion &&
+        promotion.fen === g.fen() &&
+        g.turn() === current.human &&
+        move.from === promotion.from &&
+        move.to === promotion.to &&
+        ["q", "r", "b", "n"].includes(move.promotion);
+      if (completePromotion && !validPromotion) {
+        setPromotion(null);
+        setError("The position changed. Select the pawn again.");
+        return;
+      }
       if (
         current.result ||
-        context.paused ||
+        (context.paused && !validPromotion) ||
         context.replaying ||
         context.reviewBusy
       )
@@ -240,7 +263,7 @@ export default function App() {
       const color = g.turn(),
         now = performance.now(),
         elapsed =
-          TIME_CONTROLS[current.settings.time][0] === 0
+          context.paused || TIME_CONTROLS[current.settings.time][0] === 0
             ? 0
             : Math.max(0, now - lastTick.current),
         clocks = {
@@ -256,6 +279,7 @@ export default function App() {
       actionRef.current?.abort();
       setThinking(false);
       setSession(commitMove(current, move, clocks));
+      if (validPromotion) setPaused(false);
       setSelected(null);
       setHint(null);
       setPromotion(null);
@@ -354,6 +378,35 @@ export default function App() {
     },
     [],
   );
+  function requestMove(from, to) {
+    if (!canMove) return;
+    const moves = game
+      .moves({ square: from, verbose: true })
+      .filter((move) => move.to === to);
+    if (!moves.length) return;
+    if (moves.some((move) => move.promotion)) {
+      actionRef.current?.abort();
+      setThinking(false);
+      setHint(null);
+      setSelected(from);
+      promotionPress.current = null;
+      promotionSubmitted.current = false;
+      promotionTouchHandled.current = false;
+      setPromotion({ from, to, fen });
+      return;
+    }
+    play({ from, to });
+  }
+  function choosePromotion(piece) {
+    if (!promotion || promotionSubmitted.current) return;
+    // Consume synchronously: touch browsers can send a compatibility click too.
+    promotionSubmitted.current = true;
+    promotionPress.current = null;
+    play(
+      { from: promotion.from, to: promotion.to, promotion: piece },
+      { completePromotion: true },
+    );
+  }
   function selectSquare(square) {
     if (!canMove) return;
     const piece = game.get(square);
@@ -362,11 +415,7 @@ export default function App() {
         .moves({ square: selected, verbose: true })
         .filter((m) => m.to === square);
       if (moves.length) {
-        if (moves.some((m) => m.promotion)) {
-          setPromotion({ from: selected, to: square });
-          return;
-        }
-        play({ from: selected, to: square });
+        requestMove(selected, square);
         return;
       }
     }
@@ -713,14 +762,7 @@ export default function App() {
                           ) {
                             pointer.current = { suppress: true };
                             if (target && target !== drag.from) {
-                              const moves = game
-                                .moves({ square: drag.from, verbose: true })
-                                .filter((m) => m.to === target);
-                              if (moves.length) {
-                                if (moves.some((m) => m.promotion))
-                                  setPromotion({ from: drag.from, to: target });
-                                else play({ from: drag.from, to: target });
-                              }
+                              requestMove(drag.from, target);
                             }
                           } else pointer.current = null;
                         }}
@@ -1110,12 +1152,70 @@ export default function App() {
               <>
                 <p className="eyebrow">A WELL-EARNED UPGRADE</p>
                 <h2>Choose your piece.</h2>
+                {paused && (
+                  <p className="muted" role="status">
+                    Choose a piece to resume and complete your move.
+                  </p>
+                )}
                 <div className="promotion">
                   {["q", "r", "b", "n"].map((p) => (
                     <button
                       aria-label={`Promote to ${NAMES[p]}`}
                       key={p}
-                      onClick={() => play({ ...promotion, promotion: p })}
+                      onPointerDown={(event) => {
+                        promotionTouchHandled.current = false;
+                        if (
+                          event.pointerType === "touch" ||
+                          event.pointerType === "pen"
+                        ) {
+                          promotionPress.current = {
+                            id: event.pointerId,
+                            piece: p,
+                            x: event.clientX,
+                            y: event.clientY,
+                          };
+                        }
+                      }}
+                      onPointerUp={(event) => {
+                        if (
+                          event.pointerType !== "touch" &&
+                          event.pointerType !== "pen"
+                        )
+                          return;
+                        promotionTouchHandled.current = true;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        const press = promotionPress.current;
+                        promotionPress.current = null;
+                        const bounds =
+                          event.currentTarget.getBoundingClientRect();
+                        if (
+                          !press ||
+                          press.id !== event.pointerId ||
+                          press.piece !== p ||
+                          Math.hypot(
+                            event.clientX - press.x,
+                            event.clientY - press.y,
+                          ) > 12 ||
+                          event.clientX < bounds.left ||
+                          event.clientX > bounds.right ||
+                          event.clientY < bounds.top ||
+                          event.clientY > bounds.bottom
+                        )
+                          return;
+                        choosePromotion(p);
+                      }}
+                      onPointerCancel={() => {
+                        promotionPress.current = null;
+                        promotionTouchHandled.current = true;
+                      }}
+                      onClick={(event) => {
+                        if (
+                          event.detail === 0 ||
+                          !promotionTouchHandled.current
+                        )
+                          choosePromotion(p);
+                      }}
                     >
                       {GLYPHS[p]}
                       <small>{NAMES[p]}</small>

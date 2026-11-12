@@ -5,6 +5,7 @@ The independent reviewer added and ran 39 automated tests, corrected defects, an
 ## Acceptance checklist
 
 ### Rules and state
+
 - [x] Rule fixtures cover pinned pieces, castling, castling through check, en passant and undo, all four promotions, checkmate, stalemate, threefold repetition, fifty moves, and insufficient material.
 - [x] Side-selection helper supports White, Black, and deterministic random-side fixtures.
 - [x] Undo returns control to White or Black, preserves the bot opening for Black, and restores both clocks before awarded increments.
@@ -15,6 +16,7 @@ The independent reviewer added and ran 39 automated tests, corrected defects, an
 - [ ] Physical device gameplay and all possible dead-position configurations are not exhaustively tested.
 
 ### Engine and review
+
 - [x] Real Stockfish lite-single WASM searches return legal moves for White, Black, and a promotion position under Node.
 - [x] Worker protocol fixtures cover MultiPV, centipawn and mate scores, abort before/during a request, load errors, and underpromotion UCI conversion.
 - [x] Terminal analysis returns a mate score for checkmate and zero for stalemate without starting a worker.
@@ -26,6 +28,7 @@ The independent reviewer added and ran 39 automated tests, corrected defects, an
 - [ ] Review accuracy against long analysis or a tactical benchmark has not been measured.
 
 ### Interface and clocks
+
 - [x] Static review confirms all six clock controls: untimed, 3, 5, 10, 3+2, and 5+3.
 - [x] Review corrected fractional elapsed-time loss before a move and guards pending interactions after pause or replay.
 - [x] Review corrected stale hints after a move and capture displays after promotion/import.
@@ -38,6 +41,7 @@ The independent reviewer added and ran 39 automated tests, corrected defects, an
 - [ ] Physical touch hardware, native mobile browsers, screen readers, and audible sound output were not observed.
 
 ### Distribution
+
 - [x] `npx vite build` passed after the first application corrections.
 - [x] `npx vitest run` passed: 39 tests across two files.
 - [x] The browser worker uses the unmodified lite-single filename and adjacent WASM file.
@@ -85,14 +89,14 @@ Ratings remain estimates; low-level behavior is not a tournament-calibrated 700 
 The reviewer ran `node scripts/calibrate.mjs` with the actual lite-single engine. All 163 legal candidates across seven opening, middlegame, endgame, and tactical positions returned at depth seven. Each profile used 70,000 seeded selections. The fixture and method are in `tests/fixtures/calibration.json`; a unit test checks relative loss ordering.
 
 | Displayed level | Mean centipawn loss | Best-move selection |
-| --- | ---: | ---: |
-| 700 | 108.27 | 25.85% |
-| 1000 | 88.54 | 28.49% |
-| 1300 | 71.83 | 30.73% |
-| 1600 | 28.60 | 38.45% |
-| 2000 | 19.02 | 41.87% |
-| 2400 | 9.45 | 52.61% |
-| GM | 0.00 | 100.00% |
+| --------------- | ------------------: | ------------------: |
+| 700             |              108.27 |              25.85% |
+| 1000            |               88.54 |              28.49% |
+| 1300            |               71.83 |              30.73% |
+| 1600            |               28.60 |              38.45% |
+| 2000            |               19.02 |              41.87% |
+| 2400            |                9.45 |              52.61% |
+| GM              |                0.00 |             100.00% |
 
 This isolates selection weighting with fixed candidate scores. It does not measure Elo, tournament results, or the effect of each preset's actual search-time budget. The seven positions are not a representative tournament benchmark.
 
@@ -100,9 +104,30 @@ This isolates selection weighting with fixed candidate scores. It does not measu
 
 A test that mixed raw CDP touch dragging and an immediate Playwright tap produced touch/pointer events on Hint but no native click. No hint worker started. CSS changes and detaching CDP did not change this result. A delayed tap produced a native click and a visible hint. Separating drag and touch-control tests into fresh browser contexts passed both checks. The application did not receive artificial duplicate touch handlers. Physical-device behavior after an immediate drag was not observed.
 
-## Final verification handoff
+## Initial release verification
 
 - Checked: 39 core tests and 12 browser tests at `BASE_PATH=/chess/`, as reported by the implementation agent after the final preference changes.
-- PASS: all 12 browser tests passed at /chess/, including metadata import/export.: The twelfth browser regression checks imported PGN metadata on export. The implementation agent will replace this line with the final result before delivery.
+- All 12 initial-release browser tests passed at /chess/, including imported PGN metadata export.
 - After this document changes, rebuild the distribution so `app-source.tar.gz` includes the final checklist.
 
+## Promotion release-blocker review — November 12, 2026
+
+### Reproduced baseline
+
+The independent reviewer ran the unchanged production build before the correction:
+
+- All 32 desktop cases passed: four promotion choices, both colors, captures and noncaptures, click and drag movement.
+- Four mobile board-input cases passed: tap and touch drag for a capture underpromotion in each color. Piece-choice activation used a mouse click in this first pass.
+- Every matrix case checked all four selector options, an unchanged pending position, the explicit chess.js promotion property, SAN move history, a legal real-engine reply, and paired undo to the exact initial FEN.
+- The timed hidden-tab regression failed: selecting Knight after a simulated visibility pause left the selector open. The 3+2 clock remained paused, but no promotion completed.
+- The timeout regression failed: the game reached “Black wins on time” while the selector remained open above the game.
+
+The visibility test dispatches the browser visibility event with document.hidden overridden. It does not switch a physical device between apps.
+
+### Correction reviewed
+
+The implementation routes click and drag requests through one promotion entry point. Pending promotion records the originating FEN. A selected piece must match that FEN, side to move, source, destination, and supported promotion type. Completing a valid paused promotion explicitly resumes play without charging hidden-tab time. A visible notice states this behavior. Terminal results close the selector. Other board moves are disabled while promotion is pending.
+
+The first correction passed 39 core tests and all 50 browser tests, including the two reproduced pause/timeout regressions. A follow-up strengthened mobile coverage to activate promotion choices through touch rather than mouse clicks. Tap-to-move plus tap-choice passed for both colors. Touch-drag plus an immediate touch-choice failed for both colors. The reviewer used one CDP touch stream throughout; no mixed gesture API or delay was required. An event trace showed pointerdown, touchstart, pointerup, and touchend on the intended promotion button, but no click event. The existing click-only handler did not run. The direct touch correction passed eight focused browser tests: four true-touch capture promotion cases, moved-out and cancelled touches, keyboard Enter and Space, and duplicate compatibility-click consumption. The same touch session now performs the drag and the immediate piece-choice tap with no artificial delay. The corrected selector handles touch/pen pointer release directly, validates the initial press, movement distance and release bounds, and consumes a promotion once. Mouse clicks and keyboard activation remain supported. The final compatibility-click guard passed the full suite at BASE_PATH=/chess/: 54 browser tests, including 42 promotion regressions. The core suite passed 39 tests. The production build passed.
+
+Review limit: browser touch emulation was checked at 390x844. Physical phone and pen input were not checked.

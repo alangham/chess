@@ -163,8 +163,14 @@ test("desktop layout and static release assets", async ({ page, request }) => {
     "licenses/Stockfish-GPL-3.0.txt",
     "manifest.webmanifest",
     "icon-192.png",
+    "apple-touch-icon.png",
+    "favicon.ico",
   ])
     expect((await request.get(path)).ok()).toBe(true);
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
+    "href",
+    /apple-touch-icon\.png$/,
+  );
 });
 
 test("touch drag and legal bot response", async ({ page, context }) => {

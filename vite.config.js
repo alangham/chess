@@ -7,7 +7,14 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "prompt",
-      includeAssets: ["icon.svg", "icon-192.png", "icon-512.png", "licenses/*"],
+      includeAssets: [
+        "icon.svg",
+        "icon-192.png",
+        "icon-512.png",
+        "apple-touch-icon.png",
+        "favicon.ico",
+        "licenses/*",
+      ],
       manifest: {
         name: "Quiet Knight — Chess, at your pace",
         short_name: "Quiet Knight",

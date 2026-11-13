@@ -103,6 +103,8 @@ execFileSync("tar", [
   "public/icon.svg",
   "public/icon-192.png",
   "public/icon-512.png",
+  "public/apple-touch-icon.png",
+  "public/favicon.ico",
 ]);
 console.log(
   "Bundled engine binaries, matching source, NNUE, app source, notices and checksums.",

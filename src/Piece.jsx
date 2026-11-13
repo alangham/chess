@@ -1,62 +1,134 @@
+import { useId } from "react";
+
 // Original vector pieces. No font glyphs or external artwork are required.
+// Each part is filled, shaded along its lower right edge, then outlined.
+// Later parts sit on top of earlier ones, so overlaps read as separate forms.
+
+// Rounded rectangle.
+const box = (x, y, w, h, k) =>
+  `M${x + k} ${y}H${x + w - k}A${k} ${k} 0 0 1 ${x + w} ${y + k}V${y + h - k}` +
+  `A${k} ${k} 0 0 1 ${x + w - k} ${y + h}H${x + k}A${k} ${k} 0 0 1 ${x} ${y + h - k}` +
+  `V${y + k}A${k} ${k} 0 0 1 ${x + k} ${y}Z`;
+// Circle.
+const dot = (cx, cy, k) =>
+  `M${cx - k} ${cy}A${k} ${k} 0 1 0 ${cx + k} ${cy}A${k} ${k} 0 1 0 ${cx - k} ${cy}Z`;
+
+const BASE = box(7.5, 37.5, 33, 6.5, 2.8);
+const PLINTH = box(11, 33, 26, 5.2, 2.2);
+
+const PIECES = {
+  p: {
+    parts: [
+      "M18.6 25C18.6 31 15.4 34.6 13 38H35C32.6 34.6 29.4 31 29.4 25Z",
+      box(9.5, 37.5, 29, 6.5, 2.8),
+      dot(24, 14.8, 7.8),
+      box(15.2, 21.4, 17.6, 4.8, 2.4),
+    ],
+  },
+  r: {
+    parts: [
+      "M15 33.5L16.4 18.5H31.6L33 33.5Z",
+      PLINTH,
+      BASE,
+      "M12 15.5V7.3A1.3 1.3 0 0 1 13.3 6H17.3A1.3 1.3 0 0 1 18.6 7.3V9.8H21.2V7.3" +
+        "A1.3 1.3 0 0 1 22.5 6H25.5A1.3 1.3 0 0 1 26.8 7.3V9.8H29.4V7.3" +
+        "A1.3 1.3 0 0 1 30.7 6H34.7A1.3 1.3 0 0 1 36 7.3V15.5Z",
+      box(11, 14.6, 26, 4.8, 2.2),
+    ],
+  },
+  b: {
+    parts: [
+      "M19.4 27C19.4 30.8 17 33.2 15 34.5H33C31 33.2 28.6 30.8 28.6 27Z",
+      box(12, 33.5, 24, 4.8, 2.2),
+      box(8.5, 37.5, 31, 6.5, 2.8),
+      "M24 6.6C30.6 10.2 34 15 34 19C34 22.8 29.8 24.8 24 24.8" +
+        "C18.2 24.8 14 22.8 14 19C14 15 17.4 10.2 24 6.6Z",
+      box(14.6, 23.2, 18.8, 4.6, 2.3),
+      dot(24, 5, 2.6),
+    ],
+    lines: ["M27.6 11.4L22.6 18.2"],
+  },
+  n: {
+    parts: [
+      "M16.2 34C16.6 29.6 19.8 27 21 24C18.6 25.4 16 26.4 13 26.8" +
+        "C10.2 27.2 7.8 25.2 8.2 22.6C8.6 19.9 11 17.2 13.2 14.8" +
+        "C15.4 12.4 17.6 10 20.2 8.2L21.6 3.6C21.8 2.8 22.8 2.6 23.3 3.3L26 6.6" +
+        "C32.6 7.4 37.4 13 37.8 21C38 26 37.4 30 36.6 34Z",
+      PLINTH,
+      BASE,
+    ],
+    lines: ["M28.2 9.6C32.6 13 34.6 19.4 33.6 30"],
+    dots: [dot(18.8, 12.8, 1.45), dot(11, 22, 1)],
+  },
+  q: {
+    parts: [
+      "M16.6 34C18.2 31.2 19.2 28.6 19.2 25.5H28.8C28.8 28.6 29.8 31.2 31.4 34Z",
+      PLINTH,
+      BASE,
+      "M14.6 24L9.4 11.6L15.6 16.6L16.8 8.6L21.2 15L24 7.2L26.8 15L31.2 8.6" +
+        "L32.4 16.6L38.6 11.6L33.4 24Z",
+      box(14.4, 22.4, 19.2, 4.8, 2.4),
+      dot(9.2, 10.6, 2.4),
+      dot(16.8, 7.4, 2.4),
+      dot(24, 5.8, 2.6),
+      dot(31.2, 7.4, 2.4),
+      dot(38.8, 10.6, 2.4),
+    ],
+  },
+  k: {
+    parts: [
+      "M16.8 34C18.4 31 19.4 28.4 19.4 25.5H28.6C28.6 28.4 29.6 31 31.2 34Z",
+      PLINTH,
+      BASE,
+      "M22.5 1.8H25.5V4.6H28.3V7.6H25.5V11.4H22.5V7.6H19.7V4.6H22.5Z",
+      "M15.6 23.2C14.6 19.6 12.6 15.6 12.8 13.2C13 11.2 15.2 10.4 18 11" +
+        "C20.4 11.5 22.4 11.4 24 10.6C25.6 11.4 27.6 11.5 30 11" +
+        "C32.8 10.4 35 11.2 35.2 13.2C35.4 15.6 33.4 19.6 32.4 23.2Z",
+      box(14.2, 22.2, 19.6, 4.8, 2.4),
+    ],
+    lines: ["M14.6 16.6C20.8 17.8 27.2 17.8 33.4 16.6"],
+  },
+};
+
 export default function Piece({ type = "n", color = "b", className = "" }) {
-  const fill = color === "w" ? "var(--piece-white)" : "var(--piece-black)",
-    stroke = color === "w" ? "var(--piece-outline)" : "var(--piece-highlight)";
+  // Clip ids must be unique per instance; strip characters that url() rejects.
+  const uid = useId().replace(/[^a-zA-Z0-9_]/g, "");
+  const tone = color === "w" ? "white" : "black",
+    fill = `var(--piece-${tone}-fill)`,
+    shade = `var(--piece-${tone}-shade)`,
+    line = `var(--piece-${tone}-line)`;
+  const { parts, lines = [], dots = [] } = PIECES[type] || PIECES.n;
   return (
     <svg
       className={`chess-piece ${className}`}
       viewBox="0 0 48 48"
-      fill={fill}
-      stroke={stroke}
-      strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
     >
-      {type === "p" && (
-        <>
-          <circle cx="24" cy="12" r="6.5" />
-          <path d="M18 20h12l-2 4c0 6 2 9 7 12H13c5-3 7-6 7-12z" />
-          <path d="M14 36h20l3 6H11z" />
-        </>
-      )}
-      {type === "r" && (
-        <>
-          <path d="M11 7h7v6h4V7h4v6h4V7h7v13l-6 4v11H17V24l-6-4z" />
-          <path d="M17 24h14M13 35h22l3 7H10z" />
-          <path d="M13 19h22" />
-        </>
-      )}
-      {type === "b" && (
-        <>
-          <path d="M24 4c-2 4-11 9-11 16 0 4 4 7 11 7s11-3 11-7c0-7-9-12-11-16z" />
-          <path d="m25 11-6 8M19 27h10l-1 5 7 5H13l7-5zM13 37h22l3 5H10z" />
-        </>
-      )}
-      {type === "n" && (
-        <>
-          <path d="m18 4 1 7-8 10-4 8 7 3 8-5-3 10h19c-2-7 0-17-7-23L25 9l-1-5-3 5z" />
-          <path d="m18 20-4 6m12-9c6 5 5 12 4 16M12 37h25l2 5H9z" />
-          <circle cx="22" cy="16" r="1" fill={stroke} stroke="none" />
-        </>
-      )}
-      {type === "q" && (
-        <>
-          <path d="m9 13 8 7 7-10 7 10 8-7-6 20H15z" />
-          <circle cx="8" cy="11" r="3" />
-          <circle cx="24" cy="7" r="3" />
-          <circle cx="40" cy="11" r="3" />
-          <path d="M15 33h18l2 5H13zM12 38h24l2 4H10z" />
-        </>
-      )}
-      {type === "k" && (
-        <>
-          <path d="M24 3v10m-5-6h10" fill="none" strokeWidth="2.8" />
-          <path d="M24 17c-3-8-15-6-15 2 0 6 7 9 8 14h14c1-5 8-8 8-14 0-8-12-10-15-2z" />
-          <path d="M24 18v11M17 33h14l4 5H13zM12 38h24l2 4H10z" />
-        </>
-      )}
+      <defs>
+        {parts.map((d, i) => (
+          <clipPath key={i} id={`${uid}-p${i}`}>
+            <path d={d} />
+          </clipPath>
+        ))}
+      </defs>
+      {parts.map((d, i) => (
+        <g key={i}>
+          <g clipPath={`url(#${uid}-p${i})`}>
+            <path d={d} fill={shade} />
+            <path d={d} fill={fill} transform="translate(-2.8 -1.3)" />
+          </g>
+          <path d={d} fill="none" stroke={line} strokeWidth="1.5" />
+        </g>
+      ))}
+      {lines.map((d, i) => (
+        <path key={`l${i}`} d={d} fill="none" stroke={line} strokeWidth="1.5" />
+      ))}
+      {dots.map((d, i) => (
+        <path key={`d${i}`} d={d} fill={line} />
+      ))}
     </svg>
   );
 }

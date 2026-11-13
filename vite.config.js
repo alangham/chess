@@ -13,8 +13,8 @@ export default defineConfig({
         short_name: "Quiet Knight",
         description:
           "Private, offline chess with a thoughtful engine opponent.",
-        theme_color: "#171717",
-        background_color: "#F7F7F5",
+        theme_color: "#f5f5f7",
+        background_color: "#f5f5f7",
         display: "standalone",
         icons: [
           { src: "icon-192.png", sizes: "192x192", type: "image/png" },

@@ -101,6 +101,7 @@ export default function App() {
     promotionPress = useRef(null),
     promotionSubmitted = useRef(false),
     promotionTouchHandled = useRef(false),
+    ghostClick = useRef(null),
     lastTick = useRef(performance.now());
   const game = useMemo(
       () => fromSession(session),
@@ -185,6 +186,25 @@ export default function App() {
       if (previous?.isConnected) previous.focus();
     };
   }, [modal, !!promotion]);
+  useEffect(() => {
+    // A touch promotion closes its dialog on pointerup, before the browser
+    // sends the tap's click. Swallow that one click at the release point so it
+    // cannot reach the control that is now under the finger.
+    const swallow = (event) => {
+      const ghost = ghostClick.current;
+      if (!ghost || event.detail === 0) return;
+      ghostClick.current = null;
+      if (
+        performance.now() < ghost.until &&
+        Math.hypot(event.clientX - ghost.x, event.clientY - ghost.y) < 24
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+    document.addEventListener("click", swallow, true);
+    return () => document.removeEventListener("click", swallow, true);
+  }, []);
   useEffect(() => {
     try {
       saveSession(session);
@@ -644,8 +664,8 @@ export default function App() {
                   ? "GM"
                   : `~${session.settings.rating}`
                 : color === "w"
-                  ? "WHITE"
-                  : "BLACK"}
+                  ? "White"
+                  : "Black"}
             </span>
           </strong>
           <div className="captured">
@@ -678,18 +698,17 @@ export default function App() {
           <span className="brand-mark">
             <Piece type="n" color="w" />
           </span>
-          <span>
-            Quiet Knight<small>PLAY / STUDY / REPEAT</small>
-          </span>
+          <span>Quiet Knight</span>
         </a>
         <div className="header-right">
-          <ThemeToggle />
           <span className="local-badge">
             <i /> {offline ? "Offline ready" : "Private · on your device"}
           </span>
+          <ThemeToggle />
           <button
             className="icon-button"
             aria-label={session.settings.sound ? "Mute sound" : "Enable sound"}
+            title={session.settings.sound ? "Mute sound" : "Enable sound"}
             onClick={() =>
               setSession((s) => ({
                 ...s,
@@ -697,30 +716,35 @@ export default function App() {
               }))
             }
           >
-            {session.settings.sound ? "Sound on" : "Muted"}
+            <Icon name={session.settings.sound ? "speaker" : "speaker-off"} />
+            <span className="button-label">
+              {session.settings.sound ? "Sound on" : "Muted"}
+            </span>
           </button>
         </div>
       </header>
       <main>
         <div className="intro">
           <div>
-            <p className="eyebrow">01 / THE PLAYING ROOM</p>
             <h1 aria-live="polite" aria-atomic="true">
               {gameHeading(game, session.human, session.result)}
             </h1>
+            <p className="intro-sub">
+              You play {session.human === "w" ? "White" : "Black"} against
+              Stockfish{" "}
+              {session.settings.rating >= 2500
+                ? "GM"
+                : `~${session.settings.rating}`}
+              .
+            </p>
           </div>
           <button className="primary" onClick={() => setModal("new")}>
-            New game <span aria-hidden="true">+</span>
+            <Icon name="plus" />
+            New game
           </button>
         </div>
         <div className="game-layout">
           <section className="play-area" aria-label="Chess game">
-            <div className="board-caption">
-              <span>THE BOARD</span>
-              <span>
-                {session.human === "w" ? "YOU PLAY WHITE" : "YOU PLAY BLACK"}
-              </span>
-            </div>
             <div className="board-wrap">
               <div className="board" role="group" aria-label="Chessboard">
                 {ranks.flatMap((rank, row) =>
@@ -803,8 +827,11 @@ export default function App() {
               </div>
             </div>
             <div className="board-caption board-bottom">
-              <span>FOCUS ON THE NEXT MOVE.</span>
-              <span>{replaying ? "REPLAY" : "LOCAL / PRIVATE"}</span>
+              <span>
+                {replaying
+                  ? "You are viewing an earlier position."
+                  : "Drag or tap a piece to move."}
+              </span>
             </div>
           </section>
           <aside aria-label="Game details">
@@ -838,7 +865,7 @@ export default function App() {
                     setRevision((v) => v + 1);
                   }}
                 >
-                  {history.length ? "Resume game" : "Start playing"} <Icon />
+                  {history.length ? "Resume game" : "Start playing"}
                 </button>
               )}
               <div className="board-actions">
@@ -897,7 +924,7 @@ export default function App() {
             </section>
             <section className="panel game-panel">
               <div className="panel-heading">
-                <span className="eyebrow">02 / GAME RECORD</span>
+                <span className="eyebrow">Game record</span>
                 <span className="time-tag">{session.settings.time}</span>
               </div>
               <h2>{opening(game)}</h2>
@@ -1045,41 +1072,45 @@ export default function App() {
                 <button
                   aria-label="First position"
                   disabled={!history.length}
+                  title="First position"
                   onClick={() => {
                     setPaused(true);
                     setCursor(0);
                   }}
                 >
-                  First
+                  <Icon name="first" />
                 </button>
                 <button
                   aria-label="Previous move"
+                  title="Previous move"
                   disabled={!history.length || cursor === 0}
                   onClick={() => {
                     setPaused(true);
                     setCursor(Math.max(0, (cursor ?? history.length) - 1));
                   }}
                 >
-                  Prev
+                  <Icon name="prev" />
                 </button>
                 <button
                   aria-label="Next move"
+                  title="Next move"
                   disabled={cursor === null || cursor === history.length}
                   onClick={() =>
                     setCursor(Math.min(history.length, cursor + 1))
                   }
                 >
-                  Next
+                  <Icon name="next" />
                 </button>
                 <button
                   aria-label="Last position"
+                  title="Last position"
                   disabled={!history.length}
                   onClick={() => {
                     setPaused(true);
                     setCursor(history.length);
                   }}
                 >
-                  Last
+                  <Icon name="last" />
                 </button>
               </div>
               {replaying && (
@@ -1094,7 +1125,7 @@ export default function App() {
               )}
             </section>
             <section className="panel small-panel">
-              <h3>03 / PREFERENCES & FILES</h3>
+              <h3>Preferences & files</h3>
               <label className="toggle">
                 <span>
                   Show engine evaluation
@@ -1153,7 +1184,7 @@ export default function App() {
       </main>
       <footer>
         <span>
-          QUIET KNIGHT <span className="footer-dot">·</span> A place to think.
+          Quiet Knight <span className="footer-dot">·</span> A place to think.
         </span>
         <button onClick={() => setModal("about")}>
           About & open-source licenses
@@ -1187,11 +1218,10 @@ export default function App() {
                 setPromotion(null);
               }}
             >
-              ×
+              <Icon name="close" />
             </button>
             {promotion ? (
               <>
-                <p className="eyebrow">A WELL-EARNED UPGRADE</p>
                 <h2>Choose your piece.</h2>
                 {paused && (
                   <p className="muted" role="status">
@@ -1244,6 +1274,11 @@ export default function App() {
                           event.clientY > bounds.bottom
                         )
                           return;
+                        ghostClick.current = {
+                          x: event.clientX,
+                          y: event.clientY,
+                          until: performance.now() + 600,
+                        };
                         choosePromotion(p);
                       }}
                       onPointerCancel={() => {
@@ -1266,7 +1301,6 @@ export default function App() {
               </>
             ) : modal === "new" ? (
               <>
-                <p className="eyebrow">YOUR NEXT CHAPTER</p>
                 <h2>Settle in for a game.</h2>
                 <p className="muted">
                   Starting replaces your saved game. Export it first to keep it.
@@ -1296,6 +1330,9 @@ export default function App() {
                     max="2700"
                     step="100"
                     value={settings.rating}
+                    style={{
+                      "--range": `${((settings.rating - 700) / 2000) * 100}%`,
+                    }}
                     onChange={(e) =>
                       setSettings({
                         ...settings,
@@ -1355,7 +1392,7 @@ export default function App() {
                   />
                 </label>
                 <button className="primary full" onClick={start}>
-                  Let’s play <Icon />
+                  Let’s play
                 </button>
               </>
             ) : modal === "import" ? (
@@ -1434,7 +1471,6 @@ export default function App() {
               </>
             ) : (
               <>
-                <p className="eyebrow">BUILT IN THE OPEN</p>
                 <h2>Quiet Knight</h2>
                 <p>
                   A private chess companion. Games stay in your browser. Hidden

@@ -69,7 +69,7 @@ for(const theme of ["light","dark"]) test(`text pieces and board indicators cont
   const board=['--square-light','--square-dark','--last-light','--last-dark','--board-selected','--check-square'];
   const indicators=board.map(bg=>({name:bg,ratio:ratio('--board-marker',bg)}));
   indicators.push({name:'selected',ratio:ratio('--board-accent','--board-selected')},{name:'check',ratio:ratio('--board-danger','--check-square')});
-  const pieces=board.flatMap(bg=>[['--piece-white','--piece-outline'],['--piece-black','--piece-highlight']].map(([fill,edge])=>({name:fill+bg,ratio:Math.max(ratio(fill,bg),ratio(edge,bg))})));
+  const pieces=board.flatMap(bg=>[['--piece-white-fill','--piece-white-line'],['--piece-black-fill','--piece-black-line']].map(([fill,edge])=>({name:fill+bg,ratio:Math.max(ratio(fill,bg),ratio(edge,bg))})));
   return {text,indicators,pieces};
  });
  for(const r of ratios.text) expect(r.ratio,r.name).toBeGreaterThanOrEqual(4.5);

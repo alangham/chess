@@ -5,7 +5,7 @@ function applyTheme(theme) {
   const root = document.documentElement;
   root.dataset.theme = theme;
   root.style.colorScheme = theme;
-  root.style.backgroundColor = theme === "dark" ? "#191b1e" : "#f7f7f5";
+  root.style.backgroundColor = theme === "dark" ? "#000000" : "#f5f5f7";
   document.querySelector('meta[name="theme-color"]').content = root.style.backgroundColor;
 }
 

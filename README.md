@@ -76,7 +76,7 @@ Runtime auditing returned zero advisories. A full audit retained five low/modera
 
 ## Visual system
 
-The editorial interface uses local Inter typography, warm off-white, near-black, neutral grays, and cobalt accents. `src/style.css` owns reusable color, type, spacing, border, focus, and interaction tokens. At widths of 960px and above, the board occupies the left track and clocks, controls, evaluation, and the game record occupy the right track. Desktop width also accounts for viewport height so the complete board stays visible at the tested sizes. Narrower layouts stack the board before the secondary modules. `src/Piece.jsx` and `src/Icon.jsx` provide original SVG artwork without glyph-font fallback.
+The interface follows Apple platform conventions: local Inter typography with its Display optical size for large headings, a light gray page with white rounded cards, a silver-gray board with a soft shadow, pill buttons, a segmented Moves/Review control, iOS-style switches, and dialogs that become bottom sheets on phones. `src/style.css` owns reusable color, type, radius, shadow, focus, and interaction tokens. At widths of 960px and above, the board occupies the left track and clocks, controls, evaluation, and the game record occupy the right track. Desktop width also accounts for viewport height so the complete board stays visible at the tested sizes. Narrower layouts stack the board before the secondary modules. `src/Piece.jsx` and `src/Icon.jsx` provide original SVG artwork without glyph-font fallback.
 
 ### Color themes
 

@@ -7,6 +7,13 @@
   font-display: swap;
 }
 :root {
+  --primary-fill: #2455d6;
+  --primary-hover: #1943b6;
+  --board-marker: #171717;
+  --board-accent: #2455d6;
+  --board-danger: #a62b23;
+  --check-square: #f4dedb;
+  --coordinate-dark: #171717;
   --paper: #f7f7f5;
   --surface: #ffffff;
   --ink: #171717;
@@ -64,6 +71,43 @@
   background: var(--paper);
   line-height: 1.5;
   color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #191b1e;
+  --surface: #24272c;
+  --ink: #f2f2ec;
+  --muted: #b4b6bd;
+  --line: #44484e;
+  --control-border: #818791;
+  --accent: #9db8ff;
+  --accent-hover: #c4d4ff;
+  --accent-soft: #293955;
+  --danger: #ffb4a8;
+  --danger-soft: #492b2b;
+  --square-light: #8d969c;
+  --square-dark: #505b65;
+  --last-light: #6f86a8;
+  --last-dark: #4b6286;
+  --board-selected: #526e97;
+  --board-marker: #ffffff;
+  --board-accent: #ffffff;
+  --board-danger: #ffb4a8;
+  --check-square: #6d3733;
+  --focus: #b4caff;
+  --surface-subtle: #292d32;
+  --line-soft: #34383e;
+  --line-strong: #656b74;
+  --coordinate-light: #101419;
+  --coordinate-dark: #ffffff;
+  --coordinate-highlight: #ffffff;
+  --chart-surface: #242a32;
+  --warning: #e7c477;
+  --piece-white: #fffaf0;
+  --piece-black: #15191d;
+  --piece-outline: #15191d;
+  --piece-highlight: #fffaf0;
+  --overlay: #000000b3;
 }
 * {
   box-sizing: border-box;
@@ -258,16 +302,16 @@ main {
   margin-bottom: 12px;
 }
 .primary {
-  background: var(--accent);
+  background: var(--primary-fill);
   color: #fff;
-  border-color: var(--accent);
+  border-color: var(--primary-fill);
   padding: 11px 16px;
   min-height: 42px;
 }
 .primary:hover:not(:disabled) {
   color: #fff;
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 .intro .primary {
   min-width: 132px;
@@ -364,25 +408,25 @@ main {
   bottom: 3px;
   width: 5px;
   height: 5px;
-  background: var(--accent);
+  background: var(--board-accent);
 }
 .square.selected,
 .square.selected:hover {
   background: var(--board-selected) !important;
-  box-shadow: inset 0 0 0 3px var(--accent);
+  box-shadow: inset 0 0 0 3px var(--board-accent);
 }
 .square.check,
 .square.check:hover {
-  background: var(--danger-soft) !important;
-  box-shadow: inset 0 0 0 3px var(--danger);
+  background: var(--check-square) !important;
+  box-shadow: inset 0 0 0 3px var(--board-danger);
 }
 .square.hint {
   box-shadow:
     inset 0 0 0 2px var(--paper),
-    inset 0 0 0 5px var(--accent);
+    inset 0 0 0 5px var(--board-accent);
 }
 .square:focus-visible {
-  outline: 3px solid var(--ink);
+  outline: 3px solid var(--board-marker);
   outline-offset: -4px;
   z-index: 4;
 }
@@ -427,7 +471,7 @@ main {
 }
 .dark .rank,
 .dark .file {
-  color: #171717;
+  color: var(--coordinate-dark);
 }
 .last .rank,
 .last .file {
@@ -438,7 +482,7 @@ main {
   width: 21%;
   height: 21%;
   border-radius: 50%;
-  background: var(--ink);
+  background: var(--board-marker);
   opacity: 1;
   pointer-events: none;
   z-index: 2;
@@ -448,7 +492,7 @@ main {
   height: 91%;
   border-radius: 50%;
   background: transparent;
-  border: 4px solid var(--ink);
+  border: 4px solid var(--board-marker);
   opacity: 1;
 }
 .game-layout > aside {
@@ -475,7 +519,7 @@ main {
   height: 40px;
   flex-shrink: 0;
   padding: 3px;
-  background: #e8e8e2;
+  background: var(--square-light);
   border: var(--border);
   border-radius: 1px;
 }
@@ -533,7 +577,7 @@ main {
   border-radius: 2px;
 }
 .active .clock {
-  color: #fff;
+  color: var(--paper);
   background: var(--ink);
   border-color: var(--ink);
 }
@@ -588,8 +632,8 @@ main {
 .eval-bar {
   height: 9px;
   display: flex;
-  background: var(--ink);
-  border: 1px solid var(--ink);
+  background: var(--piece-black);
+  border: 1px solid var(--line-strong);
   margin-top: 16px;
   overflow: hidden;
   border-radius: 1px;
@@ -1452,4 +1496,16 @@ footer button:hover:not(:disabled) {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.theme-toggle { min-height: 44px; min-width: 44px; }
+@media (max-width: 540px) {
+  .header-right { gap: 6px; }
+  .theme-toggle { min-height: 44px; padding: 9px; }
+  .theme-label { display: none; }
+}
+@media (max-width: 360px) {
+  header { gap: 6px; }
+  .brand { font-size: 18px; gap: 6px; }
+  .brand small { font-size: 7px; }
 }

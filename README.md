@@ -77,3 +77,7 @@ Runtime auditing returned zero advisories. A full audit retained five low/modera
 ## Visual system
 
 The editorial interface uses local Inter typography, warm off-white, near-black, neutral grays, and cobalt accents. `src/style.css` owns reusable color, type, spacing, border, focus, and interaction tokens. At widths of 960px and above, the board occupies the left track and clocks, controls, evaluation, and the game record occupy the right track. Desktop width also accounts for viewport height so the complete board stays visible at the tested sizes. Narrower layouts stack the board before the secondary modules. `src/Piece.jsx` and `src/Icon.jsx` provide original SVG artwork without glyph-font fallback.
+
+### Color themes
+
+The header sun/moon button switches between coordinated light and dark themes. The first visit follows `prefers-color-scheme`; an explicit choice is saved separately from the game in `quiet-knight-theme`. The synchronous bootstrap in `index.html` applies the theme before application styles and rendering. Device changes continue to apply until the user chooses a theme. If browser storage is unavailable, switching still works for the current page.

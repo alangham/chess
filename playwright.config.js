@@ -19,7 +19,7 @@ export default defineConfig({
   projects: [
     {
       name: "webkit-mobile",
-      testMatch: "mobile-state.spec.js",
+      testMatch: ["mobile-state.spec.js", "theme.spec.js"],
       use: { browserName: "webkit", isMobile: true, hasTouch: true },
     },
     {

@@ -24,6 +24,7 @@ import {
 import { analyze, uciMove } from "./engine.js";
 import Piece from "./Piece.jsx";
 import Icon from "./Icon.jsx";
+import ThemeToggle from "./ThemeToggle.jsx";
 const NAMES = {
   p: "pawn",
   n: "knight",
@@ -682,6 +683,7 @@ export default function App() {
           </span>
         </a>
         <div className="header-right">
+          <ThemeToggle />
           <span className="local-badge">
             <i /> {offline ? "Offline ready" : "Private · on your device"}
           </span>
